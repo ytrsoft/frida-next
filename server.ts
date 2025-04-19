@@ -251,15 +251,17 @@ const source = `
   }
 `
 
-const createMomoProcess = async () => {
+const createMomoProcess = async (handle?: (message: any) => void) => {
   const device = await frida.getUsbDevice()
   const session = await device.attach('MOMO陌陌')
   const script = await session.createScript(source)
+  script.message.connect((message) => {
+    handle && handle(message)
+  })
   await script.load()
-  const rpc = script.exports
   return {
-    rpc,
-    unload: () => {
+    rpc: script.exports,
+    close: () => {
       script.unload()
     }
   }
@@ -267,17 +269,15 @@ const createMomoProcess = async () => {
 
 nextApp.prepare().then(() => {
   const wss = defineWebSocket()
-  createMomoProcess().then((inst) => {
-    inst.rpc.receive().then((message) => {
-      console.log(message)
+  const handle = (message: any) => {
+    wss.on('connection', (ws: WebSocket) => {
+      ws.send(message)
     })
-    // wss.on('connection', (ws: WebSocket) => {
-    //   ws.on('message', (message: Buffer) => {
-    //     console.log(`Message received: ${message}`)
-    //   })
-    // })
+  }
+  createMomoProcess(handle).then((app) => {
+    app.rpc.receive().then()
     process.on('SIGINT', () => {
-      inst.unload()
+      app.close()
     })
   })
 })
