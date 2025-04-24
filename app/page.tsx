@@ -6,19 +6,18 @@ import { Message, User } from './types'
 
 const App = () => {
 
-  const { onOpen, onMessage, postMessage } = useWebSocket()
+  const { onOpen, onMessage } = useWebSocket()
 
   onOpen((user: User) => {
-    console.log('当前用户', user)
-    postMessage(user)
+    console.log(user)
   })
 
   onMessage((message: Message) => {
-    console.log('消息', message)
+    console.log(message)
   })
 
   return (
-    <h1>Frida App</h1>
+    <h1>Frida</h1>
   )
 }
 
