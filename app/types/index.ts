@@ -31,6 +31,7 @@ interface IMessage {
   fromId: string
   toId: string
   type: number
+  isMe: boolean
   remoteUser: User
 }
 

@@ -31,7 +31,6 @@ export const useWebSocket = () => {
         console.error(data.description)
       } else {
         const payload = data.payload as Payload
-        console.log('>>>', payload)
         if (payload.type === Type.INIT) {
           openHandle.current && openHandle.current(payload.data as User)
         } else {
@@ -41,11 +40,11 @@ export const useWebSocket = () => {
     }
 
     wsRef.current.onerror = (error) => {
-      console.error('Error', error)
+      console.error('服务器错误', error)
     }
 
     wsRef.current.onclose = () => {
-      console.log('Closed')
+      console.log('服务器关闭')
     }
 
     return () => {
