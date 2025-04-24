@@ -8,5 +8,5 @@ onOpen(() => {
 })
 
 onMessage((message) => {
-  console.log('消息', message)
+  api.value.post(message)
 })

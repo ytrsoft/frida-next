@@ -57,7 +57,8 @@ export const useMomo = () => {
   const api = {
     value: {
       init: () => {},
-      receive: () => {}
+      receive: () => {},
+      post: (msg: Message) => {}
     }
   }
   const wsRef = { value: { send: (data: any) => {} } }
