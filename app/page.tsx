@@ -4,21 +4,21 @@ import { useWebSocket } from './hook'
 import { Message, User } from './types'
 
 
-const Home = () => {
+const App = () => {
 
   const { onOpen, onMessage } = useWebSocket()
 
   onOpen((user: User) => {
-    console.log('onOpen', JSON.stringify(user, null, 2))
+    console.log('当前用户', user)
   })
 
   onMessage((message: Message) => {
-    console.log('onMessage', JSON.stringify(message, null, 2))
+    console.log('消息', message)
   })
 
   return (
-    <h1>React</h1>
+    <h1>Frida App</h1>
   )
 }
 
-export default Home
+export default App

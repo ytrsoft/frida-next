@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react'
 import { Payload, Type, User, Message } from '../types'
 
-type UserCallback = (user: User) => void
-type MessageCallback = (message: Message) => void
+type UserHandle = (user: User) => void
+type MessageHandle = (message: Message) => void
 
 const createWebSocket = () => {
   const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
@@ -11,15 +11,15 @@ const createWebSocket = () => {
 
 export const useWebSocket = () => {
   const wsRef = useRef<WebSocket | null>(null)
-  const openCallbacks = useRef<UserCallback[]>([])
-  const messageCallbacks = useRef<MessageCallback[]>([])
+  const openHandle = useRef<UserHandle>(null)
+  const messageHandle = useRef<MessageHandle>(null)
 
-  const onOpen = (callback: UserCallback) => {
-    openCallbacks.current.push(callback)
+  const onOpen = (handle: UserHandle) => {
+    openHandle.current = handle
   }
 
-  const onMessage = (callback: MessageCallback) => {
-    messageCallbacks.current.push(callback)
+  const onMessage = (handle: MessageHandle) => {
+    messageHandle.current = handle
   }
 
   useEffect(() => {
@@ -27,24 +27,20 @@ export const useWebSocket = () => {
     wsRef.current = ws
 
     ws.onmessage = (event: MessageEvent) => {
-      try {
-        const { payload }: { payload: Payload } = JSON.parse(event.data)
-        if (payload.type === Type.INIT) {
-          openCallbacks.current.forEach((callback) => callback(payload.data as User))
-        } else {
-          messageCallbacks.current.forEach((callback) => callback(payload.data as Message))
-        }
-      } catch (error) {
-        console.error('未知错误', error)
+      const { payload }: { payload: Payload } = JSON.parse(event.data)
+      if (payload.type === Type.INIT) {
+        openHandle.current && openHandle.current(payload.data as User)
+      } else {
+        messageHandle.current && messageHandle.current(payload.data as Message)
       }
     }
 
     ws.onerror = (error) => {
-      console.error('未知错误', error)
+      console.error('Error', error)
     }
 
     ws.onclose = () => {
-      console.log('连接关闭')
+      console.log('Closed')
     }
 
     return () => {
