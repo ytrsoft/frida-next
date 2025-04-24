@@ -1,6 +1,7 @@
 export enum Type {
   INIT = 0,
-  MSG = 1
+  MSG = 1,
+  CUSTOM = 2
 }
 
 export interface Payload<T = any> {

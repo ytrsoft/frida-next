@@ -11,7 +11,7 @@ export const getNextApp = () => {
   return next({ dev: true })
 }
 
-export const connectWebSocket = (nextApp: any, on: () => void, port = 3000) => {
+export const connectWebSocket = (nextApp: any, on: () => void, port = 5000) => {
   const wss = new WebSocketServer({ noServer: true })
   const handle = nextApp.getRequestHandler()
   const server = createServer((req: IncomingMessage, res: ServerResponse) => {
@@ -34,14 +34,14 @@ export const connectWebSocket = (nextApp: any, on: () => void, port = 3000) => {
 
 
 export interface FridaOption {
-  processName: string
+  name: string
   script: string
   onMessage?: (message: any) => void
 }
 
 export const useFrida = async (option: FridaOption) => {
   const device = await frida.getUsbDevice()
-  const session = await device.attach(option.processName)
+  const session = await device.attach(option.name)
   const script = await session.createScript(option.script)
   script.message.connect((message) => {
     option?.onMessage && option?.onMessage(message)

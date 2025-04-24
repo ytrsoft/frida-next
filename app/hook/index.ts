@@ -22,8 +22,9 @@ export const useWebSocket = () => {
     messageHandle.current = handle
   }
 
+  const ws = createWebSocket()
+
   useEffect(() => {
-    const ws = createWebSocket()
     wsRef.current = ws
 
     ws.onmessage = (event: MessageEvent) => {
@@ -49,5 +50,10 @@ export const useWebSocket = () => {
     }
   }, [])
 
-  return { onOpen, onMessage }
+  const postMessage = (data: any) => {
+    const message = JSON.stringify(data)
+    ws.send(message)
+  }
+
+  return { onOpen, onMessage, postMessage }
 }

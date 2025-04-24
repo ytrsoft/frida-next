@@ -1,6 +1,12 @@
 import { useMomo } from './server/momo'
 
-useMomo((api) => {
-  api.init()
-  api.receive()
+const { onOpen, onMessage } = useMomo()
+
+onOpen((exports) => {
+  exports.init()
+  exports.receive()
+})
+
+onMessage((message) => {
+  console.log('消息', message)
 })
