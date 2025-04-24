@@ -1,10 +1,10 @@
 import { useMomo } from './server/momo'
 
-const { onOpen, onMessage } = useMomo()
+const { api, onOpen, onMessage } = useMomo()
 
-onOpen((exports) => {
-  exports.init()
-  exports.receive()
+onOpen(() => {
+  api.value.init()
+  api.value.receive()
 })
 
 onMessage((message) => {

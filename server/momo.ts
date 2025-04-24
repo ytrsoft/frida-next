@@ -17,34 +17,34 @@ export interface MomoExports {
 type Handle = (...args: any) => void
 
 const useWebSocket = () => {
-  const bootHandle = { current: (...args: any) => {} }
-  const conHandle = { current: (...args: any) => {} }
-  const msgHandle = { current: (...args: any) => {} }
+  const bootHandle = { value: (...args: any) => {} }
+  const conHandle = { value: (...args: any) => {} }
+  const msgHandle = { value: (...args: any) => {} }
 
   const onBoot = (handle: Handle) => {
-    bootHandle.current = handle
+    bootHandle.value = handle
   }
 
   const onConnected = (handle: Handle) => {
-    conHandle.current = handle
+    conHandle.value = handle
   }
 
   const onMessage = (handle: Handle) => {
-    msgHandle.current = handle
+    msgHandle.value = handle
   }
 
   const app = getNextApp()
 
   app.prepare().then(() => {
     const wss = connectWebSocket(app, () => {
-      bootHandle.current && bootHandle.current()
+      bootHandle.value && bootHandle.value()
     })
     wss.on('connection', (ws: WebSocket) => {
-      conHandle.current && conHandle.current(ws)
+      conHandle.value && conHandle.value(ws)
       ws.on('message', (msg: any) => {
         const json = msg.toString('utf8')
         const message = JSON.parse(json)
-        msgHandle.current && msgHandle.current(message)
+        msgHandle.value && msgHandle.value(message)
       })
     })
   })
@@ -54,14 +54,19 @@ const useWebSocket = () => {
 
 export const useMomo = () => {
   const { onConnected, onMessage } = useWebSocket()
-  const exports = { current: {} }
-  const wsRef = { current: { send: (data: any) => {} } }
-  const openHandle = { current: (...args: any) => {} }
+  const api = {
+    value: {
+      init: () => {},
+      receive: () => {}
+    }
+  }
+  const wsRef = { value: { send: (data: any) => {} } }
+  const openHandle = { value: (...args: any) => {} }
   const onOpen = (handle: Handle) => {
-    openHandle.current = handle
+    openHandle.value = handle
   }
   onConnected((ws: WebSocket) => {
-    wsRef.current = ws
+    wsRef.value = ws
     useFrida({
       script,
       name: 'MOMO陌陌',
@@ -69,12 +74,12 @@ export const useMomo = () => {
         ws.send(JSON.stringify(message))
       }
     }).then((inst) => {
-      exports.current = inst.api
-      openHandle.current && openHandle.current(inst.api)
+      api.value = inst.api as any
+      openHandle.value && openHandle.value()
       process.on('SIGINT', () => {
         inst.unload()
       })
     })
   })
-  return { exports, onOpen, onMessage }
+  return { api, onOpen, onMessage }
 }

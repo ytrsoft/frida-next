@@ -11,7 +11,7 @@ export const getNextApp = () => {
   return next({ dev: true })
 }
 
-export const connectWebSocket = (nextApp: any, on: () => void, port = 3000) => {
+export const connectWebSocket = (nextApp: any, on: () => void, port = 7040) => {
   const wss = new WebSocketServer({ noServer: true })
   const handle = nextApp.getRequestHandler()
   const server = createServer((req: IncomingMessage, res: ServerResponse) => {

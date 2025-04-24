@@ -5,7 +5,8 @@ export enum Type {
 }
 
 export interface Payload<T = any> {
-  type: Type
+  type: Type | string
+  description: string
   data: T
 }
 
@@ -31,6 +32,12 @@ interface IMessage {
   toId: string
   type: number
   remoteUser: User
+}
+
+export interface Sender {
+  momoid: string
+  remoteId: string
+  content: string
 }
 
 export type Message = Partial<IMessage>

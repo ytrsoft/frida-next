@@ -4,9 +4,9 @@ import { Payload, Type, User, Message } from '../types'
 type UserHandle = (user: User) => void
 type MessageHandle = (message: Message) => void
 
-const createWebSocket = () => {
-  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-  return new WebSocket(`${protocol}//${window.location.host}/api/ws`)
+const defineWebSocket = (location: Location) => {
+  const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:'
+  return new WebSocket(`${protocol}//${location.host}/api/ws`)
 }
 
 export const useWebSocket = () => {
@@ -22,37 +22,41 @@ export const useWebSocket = () => {
     messageHandle.current = handle
   }
 
-  const ws = createWebSocket()
-
   useEffect(() => {
-    wsRef.current = ws
+    wsRef.current = defineWebSocket(window.location)
 
-    ws.onmessage = (event: MessageEvent) => {
-      const { payload }: { payload: Payload } = JSON.parse(event.data)
-      if (payload.type === Type.INIT) {
-        openHandle.current && openHandle.current(payload.data as User)
+    wsRef.current.onmessage = (event: MessageEvent) => {
+      const data = JSON.parse(event.data)
+      if (data.type === 'error') {
+        console.error(data.description)
       } else {
-        messageHandle.current && messageHandle.current(payload.data as Message)
+        const payload = data.payload as Payload
+        console.log('>>>', payload)
+        if (payload.type === Type.INIT) {
+          openHandle.current && openHandle.current(payload.data as User)
+        } else {
+          messageHandle.current && messageHandle.current(payload.data as Message)
+        }
       }
     }
 
-    ws.onerror = (error) => {
+    wsRef.current.onerror = (error) => {
       console.error('Error', error)
     }
 
-    ws.onclose = () => {
+    wsRef.current.onclose = () => {
       console.log('Closed')
     }
 
     return () => {
-      ws.close()
+      wsRef.current?.close()
       wsRef.current = null
     }
   }, [])
 
   const postMessage = (data: any) => {
     const message = JSON.stringify(data)
-    ws.send(message)
+    wsRef.current?.send(message)
   }
 
   return { onOpen, onMessage, postMessage }
