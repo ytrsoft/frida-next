@@ -20,6 +20,7 @@ interface IUser {
   avatar: string
   device: string
   popular: string
+  distance: number
 }
 
 export type User = Partial<IUser>
