@@ -1,4 +1,4 @@
-const script = `
+const code = `
   let LOGIN_USER = null
   const USER_CACHE = {}
 
@@ -182,4 +182,4 @@ const script = `
   }
 `
 
-export default script
+export default code
