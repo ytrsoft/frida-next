@@ -36,10 +36,13 @@ interface IMessage {
   remoteUser: User
 }
 
-export interface Sender {
+export interface ISender {
   momoid: string
   remoteId: string
   content: string
 }
 
+
 export type Message = Partial<IMessage>
+
+export type Sender = Partial<ISender>

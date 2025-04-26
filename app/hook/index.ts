@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react'
-import { Payload, Type, User, Message } from '../types'
+import { useEffect, useRef, useState } from 'react'
+import { Payload, Type, User, Message, Sender } from '../types'
 
 type UserHandle = (user: User) => void
 type MessageHandle = (message: Message) => void
@@ -53,10 +53,22 @@ export const useWebSocket = () => {
     }
   }, [])
 
-  const postMessage = (data: any) => {
-    const message = JSON.stringify(data)
+  const postMessage = (sender: Sender) => {
+    const message = JSON.stringify(sender)
     wsRef.current?.send(message)
   }
 
   return { onOpen, onMessage, postMessage }
+}
+
+export const useUser = () => {
+  return useState<User>()
+}
+
+export const useGroup = () => {
+  return useState<Array<User>>([])
+}
+
+export const useMessages = () => {
+  return useState<Array<Message>>([])
 }
