@@ -89,7 +89,7 @@ const ChatApp = () => {
                   <MessageList messages={messages} />
                 </ScrollArea>
                 <div className="flex-none">
-                  <div className="flex gap-4">
+                  <div className="flex gap-2">
                     <Input
                       type="text"
                       value={content}
