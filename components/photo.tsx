@@ -10,13 +10,12 @@ type Props = {
 }
 
 const Photo: FC<Partial<Props>> = ({ user }) => {
-  const borderClass = user?.sex ? 'border-pink-500' : 'border-blue-500';
-
+  const borderClass = user?.sex === 0 ? 'border-pink-500' : 'border-blue-500';
   return (
     <div>
       <Avatar className={`border ${borderClass} border-2 rounded-full`}>
         <AvatarImage src={`/api/image?id=${user?.avatar}`} />
-        <AvatarFallback>
+        <AvatarFallback className="text-gray-200">
           {(user?.name || user?.name)?.charAt(0)}
         </AvatarFallback>
       </Avatar>
