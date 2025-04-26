@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { DependencyList, useEffect, useRef, useState } from 'react'
 import { Payload, Type, User, Message, Sender } from '../types'
 
 type UserHandle = (user: User) => void
@@ -71,4 +71,17 @@ export const useGroup = () => {
 
 export const useMessages = () => {
   return useState<Array<Message>>([])
+}
+
+export const useScrollArea = (deps?: DependencyList) => {
+  const scrollRef = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    if (scrollRef.current) {
+      const el = scrollRef.current.querySelector(
+        '[data-radix-scroll-area-viewport]'
+      ) as HTMLDivElement
+      el.scrollTop = el.scrollHeight
+    }
+  }, deps || [])
+  return scrollRef
 }

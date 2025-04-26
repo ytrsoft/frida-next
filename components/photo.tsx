@@ -15,7 +15,7 @@ const Photo: FC<Partial<Props>> = ({ user }) => {
     <div>
       <Avatar className={`border ${borderClass} border-2 rounded-full`}>
         <AvatarImage src={`/api/image?id=${user?.avatar}`} />
-        <AvatarFallback className="text-gray-200">
+        <AvatarFallback className="text-white bg-black">
           {(user?.name || user?.name)?.charAt(0)}
         </AvatarFallback>
       </Avatar>

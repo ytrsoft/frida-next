@@ -13,29 +13,25 @@ type Props = {
 }
 
 const Group: FC<Props> = ({ users, onSelectUser, selectedUser }) => {
-  return (
-    <ScrollArea className="h-full">
-      {users.map((user) => (
-        <div
-          key={user.id}
-          onClick={() => onSelectUser?.(user)}
-          className={cn(
-            "flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors",
-            selectedUser?.id === user.id ? "bg-primary/10" : "hover:bg-muted",
-          )}
-        >
-          <Photo user={user} />
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between">
-              <h3 className="font-medium truncate">{user.name}</h3>
-              <span className="text-xs text-muted-foreground">{user.age}</span>
-            </div>
-            <p className="text-xs text-muted-foreground truncate">{user.sign}</p>
-          </div>
+  return users.map((user) => (
+    <div
+      key={user.id}
+      onClick={() => onSelectUser?.(user)}
+      className={cn(
+        "flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors",
+        selectedUser?.id === user.id ? "bg-primary/10" : "hover:bg-muted",
+      )}
+    >
+      <Photo user={user} />
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between">
+          <h3 className="font-medium truncate">{user.name}</h3>
+          <span className="text-xs text-muted-foreground">{user.age}</span>
         </div>
-      ))}
-    </ScrollArea>
-  )
+        <p className="text-xs text-muted-foreground truncate">{user.sign}</p>
+      </div>
+    </div>
+  ))
 }
 
 export default Group
