@@ -11,29 +11,39 @@ type Props = {
 }
 
 const MessageList: FC<Props> = ({ messages, currentUser }) => {
-  const desc = (message: Message) => {
-    const user = message.remoteUser
-    if (!message.isMe && user?.distance) {
-      return user?.name + '-' + user?.distance
+  // 格式化距离的函数，更具描述性的函数名
+  const formatDistance = (distance: number) => {
+    if (distance < 1000) {
+      return `${Math.round(distance)} m`
     }
-    return user?.name
+    const distanceInKm = distance / 1000
+    return `${distanceInKm.toFixed(2)} km`
   }
+
+  const generateMessageDescription = (message: Message) => {
+    const sender = message.remoteUser
+    if (!message.isMe) {
+      return `${sender?.name} - ${formatDistance(message?.distance as any)}`
+    }
+    return sender?.name
+  }
+
   return messages.map((message) => {
-    const isMe = message.fromId === currentUser?.id || message.isMe
+    const isCurrentUserMessage = message.fromId === currentUser?.id || message.isMe
 
     return (
-      <div key={message.id} className={cn("flex gap-3 mb-6", isMe ? "flex-row-reverse" : "flex-row")}>
+      <div key={message.id} className={cn("flex gap-3 mb-6", isCurrentUserMessage ? "flex-row-reverse" : "flex-row")}>
         <Photo user={message.remoteUser} />
 
-        <div className={cn("max-w-[70%]", isMe ? "items-end" : "items-start")}>
-          <div className={cn("flex items-center gap-2 mb-1", isMe ? "justify-end" : "justify-start")}>
-            <span className="text-sm font-medium">{desc(message)}</span>
+        <div className={cn("max-w-[70%]", isCurrentUserMessage ? "items-end" : "items-start")}>
+          <div className={cn("flex items-center gap-2 mb-1", isCurrentUserMessage ? "justify-end" : "justify-start")}>
+            <span className="text-sm font-medium">{generateMessageDescription(message)}</span>
           </div>
 
           <div
             className={cn(
               "p-3 rounded-lg",
-              isMe ? "bg-primary text-primary-foreground rounded-tr-none" : "bg-muted rounded-tl-none",
+              isCurrentUserMessage ? "bg-primary text-primary-foreground rounded-tr-none" : "bg-muted rounded-tl-none",
             )}
           >
             <p className="text-sm break-words">{message.content}</p>

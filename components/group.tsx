@@ -28,7 +28,7 @@ const Group: FC<Props> = ({ users, onSelectUser, selectedUser }) => {
           <h3 className="font-medium truncate">{user.name}</h3>
           <span className="text-xs text-muted-foreground">{user.age}</span>
         </div>
-        <p className="text-xs text-muted-foreground truncate">{user.sign}</p>
+        <p className="text-xs text-muted-foreground truncate">{user.sign || user.popular}</p>
       </div>
     </div>
   ))

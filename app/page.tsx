@@ -27,6 +27,7 @@ const ChatApp = () => {
   const chatScroll = useScrollArea([messages])
 
   const handleMessage = (message: Message) => {
+    console.log('消息', JSON.stringify(message, null, 2))
     setSelectedUser(message.remoteUser)
     setMessages((msgs) => [...msgs, message])
     if (!users.some((user) => user.id === message.remoteUser?.id)) {

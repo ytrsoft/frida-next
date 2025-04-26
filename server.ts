@@ -16,7 +16,7 @@ const {
 
 onCreated(() => {
   console.log('服务器准备就绪')
-}, 6540)
+})
 
 onMessage(postMessage)
 
