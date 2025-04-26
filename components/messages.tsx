@@ -11,7 +11,6 @@ type Props = {
 }
 
 const MessageList: FC<Props> = ({ messages, currentUser }) => {
-  // 格式化距离的函数，更具描述性的函数名
   const formatDistance = (distance: number) => {
     if (distance < 1000) {
       return `${Math.round(distance)} m`
