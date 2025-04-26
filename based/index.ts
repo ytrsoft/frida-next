@@ -5,6 +5,12 @@ import { Socket } from 'node:net'
 import { WebSocketServer, WebSocket } from 'ws'
 import { createServer, IncomingMessage, ServerResponse } from 'node:http'
 
+interface Sender {
+  momoid: string
+  remoteId: string
+  content: string
+}
+
 export const getNextApp = () => {
   return next({ dev: true })
 }
@@ -30,55 +36,64 @@ export const connectWebSocket = (nextApp: any, on: () => void, port?: number) =>
   return wss
 }
 
-export type Handle = (...args: any) => void
+type ConnectdHandle = (ws: WebSocket) => void
+type CreatedHandle = () => void
+type BindHandle = (message: any) => void
+
+interface WSRef {
+  port: number,
+  bind: BindHandle,
+  send: (message: any) => void,
+  created: () => void,
+  connected: ConnectdHandle
+}
 
 export const useWebSocket = () => {
 
-  const ref: any = {}
+  const ref: WSRef = {
+    port: 3000,
+    bind: (message: any) => {},
+    send: (message: Sender) => {},
+    created: () => {},
+    connected: (ws?: WebSocket) => {},
+  }
 
-  const bootHandle = { value: (...args: any) => {}, port: 3000 }
-  const conHandle = { value: (...args: any) => {} }
-  const msgHandle = { value: (...args: any) => {} }
-
-  const onBoot = (handle: Handle, port?: number) => {
-    bootHandle.value = handle
+  const onCreated = (handle: CreatedHandle, port?: number) => {
+    ref.created = handle
     if (port) {
-      bootHandle.port = port
+      ref.port = port
     }
   }
 
-  const onConnected = (handle: Handle) => {
-    conHandle.value = handle
+  const onConnected = (handle: ConnectdHandle) => {
+    ref.connected = handle
   }
 
-  const onReceive = (handle: Handle) => {
-    msgHandle.value = handle
+  const onReceive = (handle: BindHandle) => {
+    ref.bind = handle
   }
 
   const app = getNextApp()
 
   app.prepare().then(() => {
-    const wss = connectWebSocket(
-      app,
-      bootHandle.value,
-      bootHandle.port
-    )
+    const { port, created } = ref
+    const wss = connectWebSocket(app, created, port)
     wss.on('connection', (ws: WebSocket) => {
       ref.send = (message: any) => {
         ws.send(JSON.stringify(message))
       }
-      conHandle.value(postMessage)
+      ref.connected(ws)
       ws.on('message', (msg: any) => {
         const json = msg.toString('utf8')
         const message = JSON.parse(json)
-        msgHandle.value(message)
+        ref.bind(message)
       })
     })
   })
 
-  const postMessage = (message: any) => {
+  const postMessage = (message: Sender) => {
     ref.send && ref.send(message)
   }
 
-  return { postMessage, onBoot, onConnected, onReceive }
+  return { onCreated, onConnected, onReceive, postMessage }
 }

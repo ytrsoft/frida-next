@@ -1,15 +1,21 @@
 import * as frida from 'frida'
 import code from './code'
 
-export interface Sender {
+interface Sender {
   momoid: string
   remoteId: string
   content: string
 }
 
-export type SignalHandler = (message: any) => void
+type Handler = (message: any) => void
+type AwaitHandler = (Sender: any) => Promise<any>
 
-const defineMomo = async (handle: SignalHandler) => {
+interface MomoRef {
+  bind: Handler
+  send: AwaitHandler
+}
+
+const defineMomo = async (handle: Handler) => {
   const device = await frida.getUsbDevice()
   const session = await device.attach('MOMO陌陌')
   const script = await session.createScript(code)
@@ -19,32 +25,29 @@ const defineMomo = async (handle: SignalHandler) => {
 }
 
 export const useMomo = () => {
-  const ref: any = {}
 
-  const msgHandle = { value: (message: any) => {} }
-
-  const onMessage = (handle: SignalHandler) => {
-    msgHandle.value = handle
+  const ref: MomoRef = {
+    bind: (message: any) => {},
+    send: async (message: Sender) => Promise<any>
   }
 
-  const setup = () => {
-    defineMomo((message) => {
-      msgHandle.value(message)
-    })
+  const onMessage = (handle: Handler) => {
+    ref.bind = handle
+  }
+
+  const runApp = () => {
+    defineMomo(ref.bind)
     .then((script) => {
       script.exports.init()
       script.exports.receive()
       ref.send = script.exports.post
-      process.on('SIGINT', () => {
-        script?.unload()
-      })
     })
   }
 
   const sendMessage = (message: Sender) => {
-    ref.send && ref.send(message)
+    ref.send(message)
   }
 
-  return { setup, onMessage, sendMessage }
+  return { runApp, onMessage, sendMessage }
 }
 

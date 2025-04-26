@@ -2,25 +2,25 @@ import { useMomo } from './based/momo'
 import { useWebSocket } from './based/index'
 
 const {
-  setup,
+  runApp,
   onMessage,
   sendMessage
 } = useMomo()
 
 const {
-  onBoot,
+  onCreated,
   onConnected,
   onReceive,
   postMessage
 } = useWebSocket()
 
 
-onBoot(() => {
-  console.log('服务器启动')
-}, 7788)
+onCreated(() => {
+  console.log('服务器准备就绪')
+})
 
 onMessage(postMessage)
 
-onConnected(setup)
+onConnected(runApp)
 
 onReceive(sendMessage)
