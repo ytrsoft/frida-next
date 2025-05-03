@@ -1,8 +1,9 @@
 'use client'
 
-import { Message } from './types'
+import { sample } from 'lodash'
+import { Message, User } from './types'
 import { useState } from 'react'
-import { mewMessage, wrapMessage } from './utils'
+import { mewMessage, wrapMessage, getDefaultMessages } from './utils'
 import { useUser, useGroup, useMessages, useWebSocket, useScrollArea } from './hook'
 
 import { Button } from '@/components/ui/button'
@@ -34,17 +35,39 @@ const ChatApp = () => {
     }
   }
 
-  const sendMessage = () => {
-    if (!selectedUser || !user || !content.trim()) return
+  const startMessageTask = () => {
+    const messages = getDefaultMessages()
+    let time = Number(content)
+    while (time > 0) {
+      setTimeout(() => {
+        const msg = sample(messages)
+        doMessage('跟我一起朗读：' + msg)
+      }, 3 * 1000)
+      time--
+    }
+  }
+
+  const doMessage = (message?: string) => {
     const msg = mewMessage({
-      content,
-      fromUser: user,
-      toUser: selectedUser
+      content: message || content,
+      fromUser: user as User,
+      toUser: selectedUser as User
     })
-    setMessages((msgs) => [...msgs, msg])
+    if (!message) {
+      setMessages((msgs) => [...msgs, msg])
+    }
     const sender = wrapMessage(msg)
     postMessage(sender)
     setContent('')
+  }
+
+  const sendMessage = () => {
+    if (!selectedUser || !user || !content.trim()) return
+    if (isNaN(content as any)) {
+      doMessage()
+    } else {
+      startMessageTask()
+    }
   }
 
   onOpen(setUser)

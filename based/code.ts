@@ -152,9 +152,13 @@ const code = `
       const keys = args[1].keySet().toArray().toString()
       if (keys.includes('msgs')) {
         const msgs = args[1].get('msgs')
-        const list = List.$new(msgs)
-        for (let i = 0; i < list.size(); i++) {
-          handleMesage(list.get(i), handle)
+        try {
+          const list = List.$new(msgs);
+          for (let i = 0; i < list.size(); i++) {
+            handleMesage(list.get(i), handle);
+          }
+        } catch(e) {
+          handleMesage(msgs, handle);
         }
       }
       return this.a(...args)
