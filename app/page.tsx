@@ -38,13 +38,14 @@ const ChatApp = () => {
   const startMessageTask = () => {
     const messages = getDefaultMessages()
     let time = Number(content)
-    while (time > 0) {
-      setTimeout(() => {
-        const msg = sample(messages)
-        doMessage('跟我一起朗读：' + msg)
-      }, 3 * 1000)
+    var id = setInterval(() => {
+      if (time <= 0) {
+        clearInterval(id)
+      }
+      const msg = sample(messages)
+      doMessage('跟我一起朗读：' + msg)
       time--
-    }
+    }, 3 * 1000)
   }
 
   const doMessage = (message?: string) => {
