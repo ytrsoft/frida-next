@@ -10,6 +10,7 @@ type Props = {
 }
 
 const Photo: FC<Partial<Props>> = ({ user }) => {
+  if (!user) return null
   const borderClass = user?.sex === 0 ? 'border-pink-500' : 'border-blue-500';
   return (
     <div>

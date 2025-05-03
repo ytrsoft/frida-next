@@ -1,7 +1,7 @@
 'use client'
 
 import { Message } from './types'
-import { useState, KeyboardEvent, ChangeEvent } from 'react'
+import { useState } from 'react'
 import { mewMessage, wrapMessage } from './utils'
 import { useUser, useGroup, useMessages, useWebSocket, useScrollArea } from './hook'
 
@@ -47,16 +47,6 @@ const ChatApp = () => {
     setContent('')
   }
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter') {
-      sendMessage()
-    }
-  }
-
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setContent(event.target.value)
-  }
-
   onOpen(setUser)
 
   onMessage(handleMessage)
@@ -93,8 +83,14 @@ const ChatApp = () => {
                     <Input
                       type="text"
                       value={content}
-                      onChange={handleChange}
-                      onKeyDown={handleKeyDown} />
+                      onChange={(e) => {
+                        setContent(e.target.value)
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          sendMessage()
+                        }
+                      }} />
                     <Button onClick={sendMessage}>发送</Button>
                   </div>
                 </div>
